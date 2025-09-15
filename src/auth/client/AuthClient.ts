@@ -1,9 +1,9 @@
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-import { differenceInSeconds } from "date-fns";
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { differenceInSeconds } from 'date-fns';
 
-import { Config } from "../../shared/config";
-import { getErrorMessage } from "../../shared/utils/error";
+import { Config } from '@/src/shared/config';
+import { getErrorMessage } from '@/src/shared/utils/error';
 
 export class AuthError extends Error {
     constructor(message: string) {
@@ -92,9 +92,9 @@ export class AuthClient {
         return !!cookie;
     }
 
-     /**
-     * Clear the current access token
-     */
+    /**
+    * Clear the current access token
+    */
     clearToken(): void {
         // Remove access token from local storage
         if (typeof (Storage) !== 'undefined') {
