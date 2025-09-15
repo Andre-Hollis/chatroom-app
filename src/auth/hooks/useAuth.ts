@@ -1,7 +1,8 @@
+import { AuthClient, type IPasswordLoginParams } from '@/auth/client/AuthClient';
+import type { ITokenData } from '@/auth/models';
 import {createContext, useContext, useEffect, useState} from 'react';
 
-import { AuthClient, type IPasswordLoginParams } from '@/src/auth/client/AuthClient';
-import type { ITokenData } from '@/src/auth/models';
+
 
 interface IUseAuthProviderValue {
     tokenData: ITokenData | null;

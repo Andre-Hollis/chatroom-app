@@ -2,9 +2,9 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { differenceInSeconds } from 'date-fns';
 
-import { Config } from '@/src/shared/config';
-import { getErrorMessage } from '@/src/shared/utils/error';
-import type { ScopeType } from '@/src/auth/models';
+import { Config } from '@/shared/config';
+import { getErrorMessage } from '@/shared/utils/error';
+import type { ScopeType } from '@/auth/models';
 
 export class AuthError extends Error {
     constructor(message: string) {
