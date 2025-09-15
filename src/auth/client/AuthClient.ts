@@ -4,12 +4,26 @@ import { differenceInSeconds } from 'date-fns';
 
 import { Config } from '@/src/shared/config';
 import { getErrorMessage } from '@/src/shared/utils/error';
+import type { ScopeType } from '@/src/auth/models';
 
 export class AuthError extends Error {
     constructor(message: string) {
         super(message);
         this.name = 'AuthError';
     }
+}
+
+export interface IPasswordLoginParams {
+    email_address: string;
+    password: string;
+}
+
+interface IAuthenticateWithCredentialsProps {
+    grant_type: 'password';
+    email_address: string;
+    password: string;
+
+    [key: string]: string;
 }
 
 interface IJwtData {
@@ -25,6 +39,7 @@ export class AuthClient {
     private storageKey: string;
     private cookieName: string;
     private accessTokenPromise: Promise<string> | null;
+    public scopes: ScopeType[];
 
     public constructor() {
         this.userEmail = null;
@@ -34,6 +49,7 @@ export class AuthClient {
         this.storageKey = 'dummy-chat-app.auth';
         this.cookieName = 'dummy-chat-app.is_authenticated';
         this.accessTokenPromise = null;
+        this.scopes = [];
     }
 
     private setAccessToken(accessToken: string) {
@@ -107,5 +123,49 @@ export class AuthClient {
         this.tokenExpiresAt = null;
         this.accessToken = null;
         this.isAuthenticated = false;
+    }
+
+    async authenticate(params: IAuthenticateWithCredentialsProps): Promise<string> {
+        const url = `${Config.apiURL}/token/`;
+
+        const formData = new FormData();
+        Object.keys(params).forEach(key => formData.append(key, params[key]));
+
+        const response = await axios.post(url, formData, {
+            withCredentials: true,
+        });
+
+        const accessToken = response.data.access_token;
+        this.setAccessToken(accessToken);
+        return accessToken;
+    }
+
+    async authenticateWithCredentials({email_address, password}: IPasswordLoginParams): Promise<string> {
+        return await this.authenticate({
+            grant_type: 'password',
+            email_address,
+            password,
+        });
+    }
+
+    async signOut(): Promise<void> {
+        const wasAuthenticated = this.isAuthenticated;
+        try {
+            await axios.get(`${Config.apiURL}/logout/`, {
+                withCredentials: true,
+            });
+            this.clearToken();
+            if (wasAuthenticated) {
+                window.location.pathname = '/';
+            }
+            return;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                throw new Error(getErrorMessage(error));
+            } else if (error instanceof Error) {
+                throw new Error(error.message);
+            }
+            throw error;
+        }
     }
 }
