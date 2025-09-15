@@ -1,30 +1,30 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router';
 
-import './styles.scss';
-import type { IPasswordLoginParams } from '@/auth/client/AuthClient';
 import { useTitle } from '@/shared/hooks/useTitle';
 import { getAxiosErrorOrThrow } from '@/shared/utils/error';
-import { useAuth } from '@/auth/hooks/useAuth';
+import { registerUser } from '@/modules/user/api';
+import type { ISignupUser } from '@/modules/user/model';
 
-export const Login = () => {
+import '../styles/Signup.scss';
+
+const Signup = () => {
     const [submitting, setSubmitting] = React.useState<boolean>();
     const navigate = useNavigate();
 
-    const {authenticateWithCredentials} = useAuth();
 
-    const {handleSubmit, register} = useForm<IPasswordLoginParams>();
+    const {handleSubmit, register} = useForm<ISignupUser>();
 
-    useTitle('Log In');
+    useTitle('Sign up');
 
-    const onSubmit = (loginParams: IPasswordLoginParams) => {
+    const onSubmit = (signupParams: ISignupUser) => {
         (async () => {
             try {
                 setSubmitting(true);
-                await authenticateWithCredentials(loginParams);
+                const user = await registerUser(signupParams);
                 navigate('/');
             } catch (error) {
                 toast.error(getAxiosErrorOrThrow((error)));
@@ -35,13 +35,15 @@ export const Login = () => {
     };
 
     return (
-        <div className="login-container">
+        <div className="signup-container">
             <form onSubmit={handleSubmit(onSubmit)}>
-                <h2>Login</h2>
-                <input type="email" placeholder="Email" required {...register('email_address')} />
+                <h2>Sign Up</h2>
+                <input type="email" placeholder="Email" required {...register('email_address')}/>
                 <input type="password" placeholder="Password" required {...register('password')}/>
-                <button type="submit" disabled={submitting}>Login</button>
+                <button type="submit" disabled={submitting}>Create Account</button>
             </form>
         </div>
     );
 };
+
+export default Signup;

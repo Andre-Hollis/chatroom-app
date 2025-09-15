@@ -5,11 +5,16 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 
 import './index.css';
+import { AccessTokenHelper } from '@/components/AccessTokenHelper/AccessTokenHelper.tsx';
+import { AuthProvider } from '@/auth/components/AuthProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <BrowserRouter>
-            <App />
+            <AuthProvider>
+                <AccessTokenHelper/>
+                <App />
+            </AuthProvider>
         </BrowserRouter>
     </StrictMode>,
 );
